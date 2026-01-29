@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Container,
   Typography,
@@ -10,6 +11,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import Masonry from "@mui/lab/Masonry";
 import DigitalLetter from "./DigitalLetter";
 import BackgroundSlideshow from "./BackgroundSlideshow";
+import { motion } from "framer-motion";
 
 const memories = [
   {
