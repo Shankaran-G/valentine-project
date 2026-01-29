@@ -135,6 +135,34 @@ const memories = [
 ];
 
 const App = () => {
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    // This simulates waiting for images to "check in"
+    const timer = setTimeout(() => setLoading(false), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          bgcolor: "#fff5f7",
+        }}
+      >
+        <motion.div
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ repeat: Infinity, duration: 1 }}
+        >
+          <FavoriteIcon sx={{ color: "#ff4d6d", fontSize: 100 }} />
+        </motion.div>
+      </Box>
+    );
+  }
   const startDate = new Date("2025-01-09");
   const today = new Date();
   const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
