@@ -198,7 +198,7 @@ const App = () => {
     >
       <BackgroundSlideshow />
       <audio ref={audioRef} loop>
-        <source src="/src/music/love.mp3" type="audio/mpeg" />
+        <source src="/music/love.mp3" type="audio/mpeg" />
       </audio>
       {/* 1. Hero Section */}
       {/* Hero Section */}
