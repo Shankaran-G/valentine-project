@@ -138,7 +138,8 @@ const memories = [
 
 const App = () => {
   const [loading, setLoading] = React.useState(true);
-
+  const audioRef = React.useRef(null);
+  const [showContent, setShowContent] = React.useState(false);
   React.useEffect(() => {
     // This simulates waiting for images to "check in"
     const timer = setTimeout(() => setLoading(false), 2500);
@@ -165,6 +166,23 @@ const App = () => {
       </Box>
     );
   }
+
+  const playMusic = () => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0;
+      audioRef.current.play();
+
+      let vol = 0;
+      const fade = setInterval(() => {
+        if (vol < 0.7) {
+          vol += 0.02;
+          audioRef.current.volume = vol;
+        } else {
+          clearInterval(fade);
+        }
+      }, 100);
+    }
+  };
   const startDate = new Date("2025-01-09");
   const today = new Date();
   const diffDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
@@ -179,84 +197,128 @@ const App = () => {
       }}
     >
       <BackgroundSlideshow />
+      <audio ref={audioRef} loop>
+        <source src="/src/music/love.mp3" type="audio/mpeg" />
+      </audio>
       {/* 1. Hero Section */}
+      {/* Hero Section */}
       <Box
         sx={{
-          height: "70vh",
+          height: "100vh",
           display: "flex",
-          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          textAlign: "center",
+          position: "relative",
         }}
       >
-        <FavoriteIcon sx={{ color: "#ff4d6d", fontSize: 60, mb: 2 }} />
-        <Typography
-          variant="h2"
-          sx={{ fontFamily: "serif", color: "#590d22", fontWeight: "bold" }}
+        <motion.div
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1 }}
+          style={{
+            background: "rgba(255,255,255,0.9)",
+            borderRadius: "24px",
+            padding: "60px 40px",
+            textAlign: "center",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+            backdropFilter: "blur(10px)",
+            maxWidth: "420px",
+            width: "90%",
+          }}
         >
-          To My Favorite Person
-        </Typography>
-        <Typography variant="h5" sx={{ mt: 2, color: "#a4133c" }}>
-          {diffDays} Days of loving you.
-        </Typography>
+          <FavoriteIcon sx={{ color: "#ff4d6d", fontSize: 60, mb: 2 }} />
+
+          <Typography
+            variant="h3"
+            sx={{ fontFamily: "serif", color: "#590d22", fontWeight: "bold" }}
+          >
+            To My Favorite Person
+          </Typography>
+
+          <Typography variant="h6" sx={{ mt: 2, color: "#a4133c" }}>
+            {diffDays} Days of loving you.
+          </Typography>
+
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              playMusic();
+              setShowContent(true);
+            }}
+            style={{
+              marginTop: "30px",
+              background: "linear-gradient(135deg,#ff4d6d,#ff758f)",
+              border: "none",
+              color: "white",
+              padding: "14px 32px",
+              borderRadius: "30px",
+              fontSize: "16px",
+              cursor: "pointer",
+              boxShadow: "0 8px 20px rgba(255,77,109,0.4)",
+            }}
+          >
+            Explore 💕
+          </motion.button>
+        </motion.div>
       </Box>
+      {showContent && (
+        <Container maxWidth="md">
+          {/* 2. Our Memories Grid */}
+          <Typography
+            variant="h4"
+            align="center"
+            sx={{ mb: 4, color: "#590d22" }}
+          >
+            Our Journey So Far
+          </Typography>
 
-      <Container maxWidth="md">
-        {/* 2. Our Memories Grid */}
-        <Typography
-          variant="h4"
-          align="center"
-          sx={{ mb: 4, color: "#590d22" }}
-        >
-          Our Journey So Far
-        </Typography>
-
-        {/* Masonry Grid: 4 Columns on Desktop, 2 on Tablet, 1 on Mobile */}
-        <Masonry
-          columns={{ xs: 1, sm: 2, md: 4 }}
-          spacing={2}
-          sx={{ margin: 0 }}
-        >
-          {memories.map((item) => (
-            <Card
-              key={item.id}
-              sx={{
-                borderRadius: 4,
-                boxShadow: "0 4px 20px rgba(255,182,193,0.2)",
-                transition: "transform 0.3s ease-in-out",
-                "&:hover": {
-                  transform: "translateY(-8px)", // Added a "lift" on hover
-                  boxShadow: "0 12px 30px rgba(255,77,109,0.3)",
-                },
-              }}
-            >
-              <CardMedia
-                component="img"
-                image={item.img}
-                alt={item.title}
-                loading="lazy"
+          {/* Masonry Grid: 4 Columns on Desktop, 2 on Tablet, 1 on Mobile */}
+          <Masonry
+            columns={{ xs: 1, sm: 2, md: 4 }}
+            spacing={2}
+            sx={{ margin: 0 }}
+          >
+            {memories.map((item, index) => (
+              <Card
+                key={index}
                 sx={{
-                  width: "100%",
-                  display: "block",
-                  borderRadius: "16px 16px 0 0",
+                  borderRadius: 4,
+                  boxShadow: "0 4px 20px rgba(255,182,193,0.2)",
+                  transition: "transform 0.3s ease-in-out",
+                  "&:hover": {
+                    transform: "translateY(-8px)", // Added a "lift" on hover
+                    boxShadow: "0 12px 30px rgba(255,77,109,0.3)",
+                  },
                 }}
-              />
-              <CardContent sx={{ p: 2, bgcolor: "white" }}>
-                <Typography variant="subtitle2" sx={{ color: "#ff4d6d" }}>
-                  {item.title}
-                </Typography>
-                <Typography variant="caption" color="textSecondary">
-                  {item.date}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))}
-        </Masonry>
+              >
+                <CardMedia
+                  component="img"
+                  image={item.img}
+                  alt={item.title}
+                  loading="lazy"
+                  sx={{
+                    width: "100%",
+                    display: "block",
+                    borderRadius: "16px 16px 0 0",
+                  }}
+                />
+                <CardContent sx={{ p: 2, bgcolor: "white" }}>
+                  <Typography variant="subtitle2" sx={{ color: "#ff4d6d" }}>
+                    {item.title}
+                  </Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    {item.date}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </Masonry>
 
-        {/* 3. The Digital Letter */}
-        <DigitalLetter />
-      </Container>
+          {/* 3. The Digital Letter */}
+          <DigitalLetter />
+        </Container>
+      )}
     </Box>
   );
 };
